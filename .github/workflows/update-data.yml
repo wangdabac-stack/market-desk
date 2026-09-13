@@ -1,10 +1,10 @@
 name: 데이터 업데이트
 
 on:
-  # 평일 19:00 KST (= UTC 10:00) 자동 실행
   schedule:
-    - cron: "0 10 * * 1-5"
-  # Actions 탭에서 버튼으로 직접 실행할 수 있게 함
+    # 예약 실행은 서버 사정에 따라 5~20분 밀릴 수 있어 조금 앞당겨 잡음
+    - cron: "50 6 * * 1-5"    # 15:50 KST — 1차, 마감 직후 속보
+    - cron: "50 9 * * 1-5"    # 18:50 KST — 2차, 확정치 반영
   workflow_dispatch:
 
 permissions:
@@ -32,12 +32,16 @@ jobs:
 
       - name: 변경분 커밋
         run: |
+          KST_NOW=$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')
+          KST_HOUR=$(TZ=Asia/Seoul date '+%H')
+          if [ "$KST_HOUR" -lt 17 ]; then ROUND="1차(마감 직후)"; else ROUND="2차(확정치)"; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/
           if git diff --staged --quiet; then
             echo "변경된 데이터가 없어 커밋을 건너뜁니다."
           else
-            git commit -m "데이터 업데이트: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')"
+            git commit -m "데이터 $ROUND 업데이트: $KST_NOW"
+            git pull --rebase
             git push
           fi
