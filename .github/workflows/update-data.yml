@@ -23,12 +23,17 @@ jobs:
           python-version: "3.12"
 
       - name: 라이브러리 설치
-        run: pip install requests
+        run: pip install requests pykrx pandas
 
       - name: 공시 수집
         env:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
         run: python scripts/fetch_disclosure.py
+
+      # 거래소 데이터가 실패해도 공시는 살아있도록 계속 진행
+      - name: 거래소 데이터 수집
+        continue-on-error: true
+        run: python scripts/fetch_market.py
 
       - name: 변경분 커밋
         run: |
