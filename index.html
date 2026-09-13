@@ -106,7 +106,7 @@ nav a{color:inherit;text-decoration:none} nav a.on{color:var(--text);font-weight
 .dl a:first-child,.dl div.item:first-child{border-top:none}
 .dl a:hover{background:var(--soft)}
 .dl time{font-size:11.5px;color:var(--muted);width:38px;flex-shrink:0}
-.dl .co{font-size:13.5px;font-weight:600;width:104px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl .co{font-size:13.5px;font-weight:600;width:118px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dl .ti2{font-size:13.5px;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dl i.go{margin-left:auto;color:var(--muted);font-size:16px}
 .stk{font-size:13px;font-weight:700;white-space:nowrap}
@@ -250,8 +250,8 @@ footer{font-size:11.5px;color:var(--muted);text-align:center;margin-top:28px;lin
     </div>
   </div>
 
-  <h2 class="sec"><i class="ti ti-file-text"></i>주요 공시<small>DART 전자공시 · 오늘 접수분</small></h2>
-  <div class="card dl" id="disc"></div>
+  <h2 class="sec"><i class="ti ti-file-text"></i>주요 공시<small id="discMeta">DART 전자공시 · 불러오는 중…</small></h2>
+  <div class="card dl" id="disc"><div class="empty">공시를 불러오는 중입니다…</div></div>
 
   <h2 class="sec"><i class="ti ti-user-shield"></i>최대주주 · 대주주 지분 변동<small>5% 이상 보유·임원 보고분</small></h2>
   <div class="card dl" id="hold"></div>
@@ -415,10 +415,49 @@ const PROG = [['차익거래', 320],['비차익거래', 2840],['코스피 합계
 document.getElementById('prog').innerHTML = PROG.map(d =>
   `<div class="pg"><div class="pg-n">${d[0]}</div><div class="pg-v num ${cls(d[1])}">${sign(d[1])}<span class="pg-u">억원</span></div></div>`).join('');
 
-/* ---------- 주요 공시 ---------- */
-const DISC = [['17:42','SK하이닉스','warn','단일판매·공급계약 체결'],['16:58','두산에너빌리티','vio','유상증자 결정 (주주배정)'],['16:20','알테오젠','ok','임상시험 결과 보고'],['15:51','카카오','dn','자기주식 취득 신탁계약 체결'],['15:30','포스코퓨처엠','up','영업(잠정)실적 공시']];
-document.getElementById('disc').innerHTML = DISC.map(d =>
-  `<a href="#"><time class="num">${d[0]}</time><span class="co">${d[1]}</span><span class="pill" style="background:var(--${d[2]}-bg);color:var(--${d[2]})">공시</span><span class="ti2">${d[3]}</span><i class="ti ti-chevron-right go"></i></a>`).join('');
+/* ---------- 주요 공시 (data/disclosure.json) ----------
+   scripts/fetch_disclosure.py 가 매일 저녁 만들어 두는 파일을 읽어온다. */
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function fmtDate(ymd){
+  if (!ymd || ymd.length !== 8) return '';
+  return `${Number(ymd.slice(4,6))}월 ${Number(ymd.slice(6,8))}일`;
+}
+
+async function loadDisclosure(){
+  const box = document.getElementById('disc');
+  const meta = document.getElementById('discMeta');
+  try {
+    // ?v= 를 붙여 브라우저가 옛 파일을 캐시에서 꺼내오지 않도록 함
+    const res = await fetch('data/disclosure.json?v=' + Date.now());
+    if (!res.ok) throw new Error('파일 없음 (' + res.status + ')');
+    const data = await res.json();
+    const items = data.items || [];
+
+    if (!items.length){
+      box.innerHTML = '<div class="empty">표시할 공시가 없습니다</div>';
+      meta.textContent = 'DART 전자공시';
+      return;
+    }
+
+    box.innerHTML = items.map(d => {
+      const mk = d.market === '코스피' ? 'up' : 'ok';
+      return `<a href="${esc(d.url)}" target="_blank" rel="noopener">
+        <span class="pill" style="background:var(--${mk}-bg);color:var(--${mk})">${esc(d.market)}</span>
+        <span class="co">${esc(d.name)}</span>
+        <span class="pill" style="background:var(--${esc(d.cls)}-bg);color:var(--${esc(d.cls)})">${esc(d.tag)}</span>
+        <span class="ti2">${esc(d.title)}</span>
+        <i class="ti ti-external-link go"></i></a>`;
+    }).join('');
+
+    meta.textContent = `DART 전자공시 · ${fmtDate(data.base_date)} 접수분 ${items.length}건 · ${data.updated_at} 갱신`;
+  } catch (err) {
+    box.innerHTML = '<div class="empty">공시를 불러오지 못했습니다<br><span style="font-size:11px">' + esc(err.message) + '</span></div>';
+    meta.textContent = 'DART 전자공시';
+    console.error('공시 로딩 실패:', err);
+  }
+}
+loadDisclosure();
 
 /* ---------- 최대주주 · 대주주 지분 변동 ---------- */
 const HOLD = [
