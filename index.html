@@ -48,6 +48,13 @@ nav a{color:inherit;text-decoration:none} nav a.on{color:var(--text);font-weight
 .sec i{font-size:20px} .sec small{margin-left:auto;font-size:12px;font-weight:400;color:var(--muted)}
 .glob{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .glob .card{padding:6px 8px 2px;overflow:hidden}
+.kridx{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ki{display:flex;align-items:center;gap:16px;padding:14px 18px}
+.ki-b{flex:1;min-width:0}
+.ki-n{font-size:12px;color:var(--sub)}
+.ki-v{font-size:24px;font-weight:700;margin:2px 0 1px;font-variant-numeric:tabular-nums}
+.ki-c{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.ki-g{width:110px;flex-shrink:0} .ki-g svg{display:block}
 .list{overflow:hidden}
 .row{display:grid;grid-template-columns:34px minmax(0,1.3fr) minmax(0,1.4fr) minmax(0,.85fr);gap:14px;align-items:center;padding:11px 18px;border-top:1px solid var(--line)}
 .row.head{border-top:none;background:var(--soft);padding:9px 18px;font-size:12px;color:var(--muted)}
@@ -135,7 +142,7 @@ footer{font-size:12px;color:var(--muted);text-align:center;margin-top:30px;line-
   .fl:nth-child(even){border-left:1px solid var(--line)}
 }
 @media (max-width:760px){
-  .glob{grid-template-columns:repeat(2,minmax(0,1fr))} .heat{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .glob{grid-template-columns:repeat(2,minmax(0,1fr))} .heat{grid-template-columns:repeat(2,minmax(0,1fr))} .kridx{grid-template-columns:1fr}
   .points{grid-template-columns:1fr} nav{display:none}
   .row{grid-template-columns:26px minmax(0,1fr) minmax(0,.8fr)} .row .amt,.row.head .h-amt{display:none}
   .flow .fl-list{grid-template-columns:1fr} .fl:nth-child(even){border-left:none}
@@ -168,7 +175,10 @@ footer{font-size:12px;color:var(--muted);text-align:center;margin-top:30px;line-
     </div>
   </section>
 
-  <h2 class="sec"><i class="ti ti-world"></i>글로벌 시세<small>TradingView 제공 · 거래소 정책에 따라 지연될 수 있음</small></h2>
+  <h2 class="sec"><i class="ti ti-flag"></i>국내 지수<small>장 마감 기준 · 자체 데이터</small></h2>
+  <div class="kridx" id="kridx"></div>
+
+  <h2 class="sec"><i class="ti ti-world"></i>해외 시세<small>TradingView 제공 · 거래소 정책에 따라 지연될 수 있음</small></h2>
   <div class="glob" id="glob"></div>
 
   <h2 class="sec"><i class="ti ti-coins"></i>거래대금 상위<small>코스피·코스닥 통합, 단위 억원</small></h2>
@@ -207,7 +217,7 @@ footer{font-size:12px;color:var(--muted);text-align:center;margin-top:30px;line-
 </div>
 
 <footer>
-  글로벌 시세는 TradingView가 제공하며 거래소 정책에 따라 지연될 수 있습니다<br>
+  해외 시세는 TradingView가 제공하며 거래소 정책에 따라 지연될 수 있습니다<br>
   국내 데이터는 장 마감 기준이며, 본 사이트의 정보는 투자 참고용입니다
 </footer>
 </div>
@@ -240,13 +250,17 @@ function tvWidget(target, file, config){
   target.appendChild(box);
 }
 
+/* ※ 코스피·코스닥·나스닥종합(IXIC)·S&P(SPX) 같은 "지수" 원본 심볼은
+   지수 사업자 라이선스 때문에 무료 위젯에 값이 안 들어옴.
+   그래서 해외는 아래처럼 CFD 심볼로 대체하고, 국내 지수는 자체 데이터로 표시함.
+   대체 심볼 후보: CAPITALCOM:US100 / PEPPERSTONE:NAS100 / OANDA:SPX500USD */
 tvWidget(document.getElementById('tvTape'), 'ticker-tape', {
   symbols: [
-    {proName:'KRX:KOSPI', title:'코스피'},
-    {proName:'KRX:KOSDAQ', title:'코스닥'},
-    {proName:'NASDAQ:IXIC', title:'나스닥'},
-    {proName:'SP:SPX', title:'S&P 500'},
+    {proName:'FOREXCOM:NSXUSD', title:'나스닥 100'},
+    {proName:'FOREXCOM:SPXUSD', title:'S&P 500'},
+    {proName:'FOREXCOM:DJI', title:'다우'},
     {proName:'FX_IDC:USDKRW', title:'달러/원'},
+    {proName:'FX_IDC:USDJPY', title:'달러/엔'},
     {proName:'TVC:USOIL', title:'WTI 유가'},
     {proName:'TVC:GOLD', title:'금'},
     {proName:'BINANCE:BTCUSDT', title:'비트코인'}
@@ -255,7 +269,7 @@ tvWidget(document.getElementById('tvTape'), 'ticker-tape', {
   colorTheme: TV_THEME, locale: 'kr'
 });
 
-[['KRX:KOSPI','코스피'],['NASDAQ:IXIC','나스닥'],['FX_IDC:USDKRW','달러/원'],['BINANCE:BTCUSDT','비트코인']]
+[['FOREXCOM:NSXUSD','나스닥'],['FOREXCOM:SPXUSD','S&P 500'],['FX_IDC:USDKRW','달러/원'],['BINANCE:BTCUSDT','비트코인']]
 .forEach(([sym]) => {
   const cell = document.createElement('div');
   cell.className = 'card';
@@ -267,9 +281,38 @@ tvWidget(document.getElementById('tvTape'), 'ticker-tape', {
   });
 });
 
-/* ---------- 거래대금 / 히트맵 / 뉴스 (자체 데이터) ---------- */
+/* ---------- 국내 지수 (자체 데이터) ---------- */
 const MAX_ROWS = 20, SHOW = 5;
 const pct = c => (c>=0?'+':'') + c.toFixed(2) + '%';
+function idxSeries(start, drift, vol, seed, n = 30){
+  let v = [], x = start, r = seed;
+  for (let i = 0; i < n; i++){ r = (r*9301+49297)%233280; x += drift + (r/233280-0.5)*vol; v.push(x); }
+  return v;
+}
+const KRIDX = [
+  {n:'코스피', v:3215.40, c:0.84, s:idxSeries(3080, 4.2, 38, 251)},
+  {n:'코스닥', v:842.17, c:-0.32, s:idxSeries(858, -0.6, 12, 617)}
+];
+function idxChart(s, up, w = 110, h = 40){
+  const mn = Math.min(...s), mx = Math.max(...s), rg = (mx-mn)||1;
+  const pt = s.map((y,i)=>[ (i/(s.length-1))*(w-2)+1, h-3-((y-mn)/rg)*(h-8) ]);
+  const line = pt.map(p=>`${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const col = `var(--${up?'up':'dn'})`, last = pt[pt.length-1];
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+    <polygon points="1,${h-1} ${line} ${(w-1).toFixed(1)},${h-1}" fill="${col}" opacity=".12"/>
+    <polyline points="${line}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linejoin="round"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2.5" fill="${col}"/></svg>`;
+}
+document.getElementById('kridx').innerHTML = KRIDX.map(d => {
+  const u = d.c >= 0;
+  return `<div class="card ki"><div class="ki-b">
+    <div class="ki-n">${d.n}</div>
+    <div class="ki-v">${d.v.toLocaleString(undefined,{minimumFractionDigits:2})}</div>
+    <div class="ki-c ${u?'up':'dn'}">${u?'▲':'▼'} ${Math.abs(d.c).toFixed(2)}%</div>
+  </div><div class="ki-g">${idxChart(d.s, u)}</div></div>`;
+}).join('');
+
+/* ---------- 거래대금 / 히트맵 / 뉴스 (자체 데이터) ---------- */
 const tv = [['삼성전자','005930','코스피',71200,1.28,21540],['SK하이닉스','000660','코스피',198500,2.64,15820],['한화에어로스페이스','012450','코스피',412000,3.12,9730],['두산에너빌리티','034020','코스피',24150,-0.82,7410],['HD현대중공업','329180','코스피',286500,1.95,6280],['에코프로비엠','247540','코스닥',131200,-2.34,5960],['알테오젠','196170','코스닥',352000,0.57,5120],['현대차','005380','코스피',221500,-0.45,4870],['셀트리온','068270','코스피',178900,0.62,4330],['NAVER','035420','코스피',192300,1.14,3980],['카카오','035720','코스피',41850,-1.06,3640],['삼성바이오로직스','207940','코스피',968000,0.31,3290],['LG에너지솔루션','373220','코스피',356500,-1.52,3010],['한미반도체','042700','코스피',98700,2.18,2870],['기아','000270','코스피',98400,-0.30,2540],['삼성중공업','010140','코스피',13280,2.47,2310],['KB금융','105560','코스피',86700,0.93,2150],['포스코퓨처엠','003670','코스피',214000,-1.87,1980],['레인보우로보틱스','277810','코스닥',187600,4.05,1820],['삼성전기','009150','코스피',142300,-0.56,1700]]
   .sort((a,b)=>b[5]-a[5]).slice(0, MAX_ROWS);
 const topAmt = tv[0][5];
