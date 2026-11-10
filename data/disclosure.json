@@ -1,29 +1,18 @@
 {
-  "updated_at": "2026-11-10 05:11",
-  "base_date": "20261110",
-  "total_fetched": 2,
+  "updated_at": "2026-11-11 00:15",
+  "base_date": "20261111",
+  "total_fetched": 1,
   "items": [
     {
-      "name": "퀀텀레일",
-      "code": "070300",
+      "name": "신테카바이오",
+      "code": "226330",
       "market": "코스닥",
-      "title": "[기재정정]주요사항보고서(감자결정)",
-      "filer": "퀀텀레일",
+      "title": "[기재정정]주요사항보고서(자기전환사채만기전취득결정)",
+      "filer": "신테카바이오",
       "tag": "자금조달",
       "cls": "vio",
-      "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261109000401",
-      "rcept_no": "20261109000401"
-    },
-    {
-      "name": "퀀텀레일",
-      "code": "070300",
-      "market": "코스닥",
-      "title": "[기재정정]주요사항보고서(전환사채권발행결정)",
-      "filer": "퀀텀레일",
-      "tag": "자금조달",
-      "cls": "vio",
-      "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261109000399",
-      "rcept_no": "20261109000399"
+      "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261110000459",
+      "rcept_no": "20261110000459"
     }
   ]
 }
