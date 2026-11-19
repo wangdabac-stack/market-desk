@@ -1,29 +1,6 @@
 {
-  "updated_at": "2026-11-19 03:26",
-  "base_date": "20261119",
-  "total_fetched": 2,
-  "items": [
-    {
-      "name": "나래나노텍",
-      "code": "137080",
-      "market": "코스닥",
-      "title": "[기재정정]주요사항보고서(자기주식취득결정)",
-      "filer": "나래나노텍",
-      "tag": "자사주",
-      "cls": "dn",
-      "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261118000368",
-      "rcept_no": "20261118000368"
-    },
-    {
-      "name": "GRT",
-      "code": "900290",
-      "market": "코스닥",
-      "title": "주요사항보고서(유상증자결정)",
-      "filer": "GRT",
-      "tag": "자금조달",
-      "cls": "vio",
-      "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261118000366",
-      "rcept_no": "20261118000366"
-    }
-  ]
+  "updated_at": "2026-11-20 01:06",
+  "base_date": "20261120",
+  "total_fetched": 1,
+  "items": []
 }
